@@ -739,6 +739,8 @@
 				<div class="col-lg-7 col-sm-12 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s" data-wow-offset="0">
 					<div class="contact">
 						<form class="form" name="enq" id="contactForm">
+							<!-- Web3Forms access key -->
+							<input type="hidden" name="access_key" value="19897d39-469d-4682-9396-e6a608e297e0">
 							<div class="row">
 								<div class="form-group col-md-6">
 									<input type="text" name="name" id="name" class="form-control" placeholder="Name" required="required">
@@ -758,7 +760,8 @@
 							</div>
 						</form>
 					</div>
-				</div><!-- END COL  -->					
+				</div><!-- END COL  -->
+					
 			</div><!-- END ROW -->
 		</div><!-- END CONTAINER -->
 	</section>
@@ -893,33 +896,33 @@
 			submitBtn.disabled = true;
 			
 			// Prepare form data
-			var formData = new FormData();
-			formData.append('name', name);
-			formData.append('email', email);
-			formData.append('subject', subject);
-			formData.append('message', message);
+			var formData = new FormData(document.getElementById('contactForm'));
+			// Ensure core fields exist (in case browser blocks FormData for some reason)
+			formData.set('name', name);
+			formData.set('email', email);
+			formData.set('subject', subject);
+			formData.set('message', message);
 			
-			// Send to PHP backend
-			fetch('contact.php', {
+			// Send via Web3Forms (no backend needed)
+			fetch('https://api.web3forms.com/submit', {
 				method: 'POST',
+				headers: { 'Accept': 'application/json' },
 				body: formData
 			})
 			.then(response => response.json())
 			.then(data => {
-				if (data.status === 'success') {
-					alert('✅ All details have been sent to Revathi! We will reach out to you soon.');
+				if (data.success) {
+					alert('✅ Message sent successfully! I will reach out to you soon.');
 					document.getElementById('contactForm').reset();
 				} else {
-					alert('✅ All details have been sent to Revathi! We will reach out to you soon.');
-					document.getElementById('contactForm').reset();
+					alert('❌ Failed to send. Please try again later.');
 				}
 				submitBtn.innerHTML = 'Click here to send';
 				submitBtn.disabled = false;
 			})
 			.catch(error => {
 				console.error('Error:', error);
-				alert('✅ All details have been sent to Revathi! We will reach out to you soon.');
-				document.getElementById('contactForm').reset();
+				alert('❌ Network error. Please check your connection and try again.');
 				submitBtn.innerHTML = 'Click here to send';
 				submitBtn.disabled = false;
 			});
